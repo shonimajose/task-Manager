@@ -1,6 +1,6 @@
 # 📝 Task Manager  App (Python)
 
-A simple command-line based Task Manager application written in Python. This app allows users to **add**, **view**, **update**, and **delete** tasks. Data is saved in a local `.json` file so that your task list is preserved between runs.
+A simple command-line based Task Manager application written in Python. This app allows users to **add**, **view**, **update**, **delete** and **filter tasks by status**. Data is saved in a local `.json` file so that your task list is preserved between runs.
 
 ---
 
