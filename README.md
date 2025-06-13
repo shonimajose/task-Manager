@@ -10,6 +10,8 @@ A simple command-line based Task Manager application written in Python. This app
 - 📋 View all tasks
 - ✏️ Update task
 - ❌ Delete a task
+- 🔍 Filter by Status
+- 🚪 Exit
 - 💾 Save/load tasks using JSON file
 
 ---
