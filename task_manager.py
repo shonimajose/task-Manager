@@ -203,7 +203,7 @@ def main():
             while True:
                 filter_by_status(task_manager)
 
-                more = retry_input("Do you want to delete another task? (y/n): ", lambda x: x.lower() in ['y', 'n'], "Enter y or n")
+                more = retry_input("Do you want to filter another task? (y/n): ", lambda x: x.lower() in ['y', 'n'], "Enter y or n")
                 if more.lower() != 'y':
                     break
                 
