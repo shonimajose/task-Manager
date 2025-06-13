@@ -82,6 +82,28 @@ class TaskManager:
             print(f"{RED}Invalid task number!{RESET}")
 
 
+def filter_by_status(task_manager):
+    def is_valid_status(value):
+        return value.title() in STATUS_OPTIONS
+
+    status_type = retry_input(
+        "\n Enter the status to filter (Pending, Inprogress, Onhold, Canceled, Completed): ",
+        validator=is_valid_status,
+        error_msg="Status must be one of: Pending, Inprogress, Onhold, Canceled, Completed"
+    )
+
+    if status_type:
+        normalized_status = NORMALIZED_STATUSES[status_type.lower()]
+        filtered_tasks = [task for task in task_manager.task if task["status"] == normalized_status]
+
+        if not filtered_tasks:
+            print(f"{RED}No tasks found with status '{normalized_status}'{RESET}")
+        else:
+            print(f"{YELLOW}Tasks with status '{normalized_status}':{RESET}")
+            for i, task in enumerate(filtered_tasks, 1):
+                print(f"{BLUE}{i}. {task['title']} - {task['description']} [{task['status']}] {RESET}")
+        print(f"{RED}{'=' * 30}{RESET}")
+
 def retry_input(prompt, validator=None, error_msg="Invalid input!", max_retries=3):
     for attempt in range(max_retries):
         user_input = input(f"{BLUE}{prompt}{RESET}").strip()
@@ -122,11 +144,13 @@ def main():
     task_manager = TaskManager()
 
     while True:
-        print("\n1. Add New Task")
+        print("\n ----TASK MANAGER----")
+        print("1. Add New Task")
         print("2. View Tasks")
         print("3. Update Task Status")
         print("4. Delete Task")
-        print("5. Exit")
+        print("5.Filter By Status")
+        print("6. Exit")
 
         choice = retry_input("Choose an option (1-5): ", validator=lambda c: c in "12345", error_msg="Please choose between 1-5")
         if choice is None:
@@ -175,11 +199,18 @@ def main():
                 more = retry_input("Do you want to delete another task? (y/n): ", lambda x: x.lower() in ['y', 'n'], "Enter y or n")
                 if more.lower() != 'y':
                     break
+        elif choice =="5":
+            while True:
+                filter_by_status(task_manager)
 
-        elif choice == "5":
+                more = retry_input("Do you want to delete another task? (y/n): ", lambda x: x.lower() in ['y', 'n'], "Enter y or n")
+                if more.lower() != 'y':
+                    break
+                
+        elif choice == "6":
             confirm_exit = retry_input("Are you sure you want to exit? (y/n): ", validator=lambda x: x.lower() in ['y', 'n'], error_msg="Please enter y or n")
             if confirm_exit and confirm_exit.lower() == 'y':
-                print(f"{YELLOW}Exiting the Manager, goodbye!{RESET}")
+                print(f"{YELLOW} Exiting the Manager, goodbye!..{RESET}")
                 break
 
 
