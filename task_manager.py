@@ -4,7 +4,6 @@ from colorama import init
 
 init(autoreset=True)
 
-# Color definitions
 RED = "\033[31m"
 GREEN = "\033[32m"
 YELLOW = "\033[33m"
@@ -12,6 +11,7 @@ BLUE = "\033[34m"
 RESET = "\033[0m"
 
 STATUS_OPTIONS = {"Pending", "Inprogress", "Onhold", "Canceled", "Completed"}
+NORMALIZED_STATUSES = {s.lower(): s for s in STATUS_OPTIONS}
 
 
 class TaskManager:
@@ -80,7 +80,6 @@ class TaskManager:
             print(f"{RED}** TASK {task_number} DELETED SUCCESSFULLY **{RESET}")
         else:
             print(f"{RED}Invalid task number!{RESET}")
-        
 
 
 def retry_input(prompt, validator=None, error_msg="Invalid input!", max_retries=3):
@@ -104,19 +103,19 @@ def prompt_task_creation(task_manager):
             task_manager.task_details(title)
         else:
             description = input(f"{BLUE}Enter Description: {RESET} ")
-            status = retry_input(
+            status_input = retry_input(
                 f"Enter status ({'/'.join(STATUS_OPTIONS)}): ",
-                validator=lambda s: s.title() in STATUS_OPTIONS,
+                validator=lambda s: s.lower() in NORMALIZED_STATUSES,
                 error_msg="Invalid status"
             )
-            if status is None:
+            if status_input is None:
                 return
-            task_manager.add_task(title, description, status.title())
+            normalized_status = NORMALIZED_STATUSES[status_input.lower()]
+            task_manager.add_task(title, description, normalized_status)
 
-        more = input(f"{BLUE}Do you want to add another task? (y/n): {RESET}").strip().lower()
-        if more != 'y':
+        more = retry_input("Do you want to add another task? (y/n): ", validator=lambda x: x.lower() in ['y', 'n'], error_msg="Enter y or n")
+        if more.lower() != 'y':
             break
-
 
 
 def main():
@@ -144,30 +143,38 @@ def main():
                 print(f"{RED}No tasks available to update. Please add tasks first!{RESET}")
                 continue
             task_manager.view_tasks()
-            task_number_str = retry_input("Enter the task number to update: ", lambda x: x.isdigit() and 1 <= int(x) <= len(task_manager.task), f"Please enter a number between 1 and {len(task_manager.task)}")
+            task_number_str = retry_input(
+                "Enter the task number to update: ",
+                validator=lambda x: x.isdigit() and 1 <= int(x) <= len(task_manager.task),
+                error_msg=f"Please enter a number between 1 and {len(task_manager.task)}"
+            )
             if task_number_str:
-                status = retry_input(
+                status_input = retry_input(
                     f"Enter new status ({'/'.join(STATUS_OPTIONS)}): ",
-                    lambda s: s.title() in STATUS_OPTIONS,
-                    "Invalid status"
+                    validator=lambda s: s.lower() in NORMALIZED_STATUSES,
+                    error_msg="Invalid status"
                 )
-                if status:
-                    task_manager.mark_task_status(int(task_number_str), status.title())
+                if status_input:
+                    normalized_status = NORMALIZED_STATUSES[status_input.lower()]
+                    task_manager.mark_task_status(int(task_number_str), normalized_status)
 
         elif choice == "4":
             while True:
-                  
                 if not task_manager.task:
                     print(f"{RED}No tasks available to delete. Please add tasks first!{RESET}")
                     break
                 task_manager.view_tasks()
-                task_number_str = retry_input("Enter the task number to delete: ", lambda x: x.isdigit() and 1 <= int(x) <= len(task_manager.task), f"Please enter a number between 1 and {len(task_manager.task)}")
+                task_number_str = retry_input(
+                    "Enter the task number to delete: ",
+                    lambda x: x.isdigit() and 1 <= int(x) <= len(task_manager.task),
+                    f"Please enter a number between 1 and {len(task_manager.task)}"
+                )
                 if task_number_str:
                     task_manager.delete_task(int(task_number_str))
-                    
+
                 more = retry_input("Do you want to delete another task? (y/n): ", lambda x: x.lower() in ['y', 'n'], "Enter y or n")
                 if more.lower() != 'y':
-                    break    
+                    break
 
         elif choice == "5":
             confirm_exit = retry_input("Are you sure you want to exit? (y/n): ", validator=lambda x: x.lower() in ['y', 'n'], error_msg="Please enter y or n")
