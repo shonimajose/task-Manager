@@ -152,7 +152,7 @@ def main():
         print("5.Filter By Status")
         print("6. Exit")
 
-        choice = retry_input("Choose an option (1-5): ", validator=lambda c: c in "12345", error_msg="Please choose between 1-5")
+        choice = retry_input("Choose an option (1-6): ", validator=lambda c: c in "123456", error_msg="Please choose between 1-6")
         if choice is None:
             continue
 
